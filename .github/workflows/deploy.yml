@@ -49,8 +49,8 @@ jobs:
           no-fail-on-empty-changeset: "1"
           parameter-overrides: >-
             ParentDomainName=${{ env.PARENT_DOMAIN_NAME }},
-            SubDomainName=${{ env.SUBDOMAIN_NAME }}
-
+            SubDomainName=${{ env.SUBDOMAIN_NAME }},
+            ParentHostedZoneId=${{ env.HOSTED_ZONES_ROUTE53 }},
       - name: Show CloudFormation Outputs
         run: |
           echo URL= ${{ steps.cloudformation.outputs }}
