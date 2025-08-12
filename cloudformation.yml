@@ -4,10 +4,8 @@ Description: Crear subdominio en Route 53 con hosting S3
 Parameters:
   ParentDomainName:
     Type: String
-    Description: Dominio principal (ej: midominio.com)
   SubDomainName:
     Type: String
-    Description: Subdominio que quieres crear (ej: test)
 
 Resources:
   # Hosted Zone para el subdominio
