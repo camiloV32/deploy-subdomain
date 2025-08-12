@@ -22,7 +22,14 @@ Resources:
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
-      AccessControl: PublicRead
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: false
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: false
 
   # Política para permitir acceso público al bucket
   PublicBucketPolicy:
@@ -45,8 +52,8 @@ Resources:
       Name: !Sub "${SubDomainName}.${ParentDomainName}"
       Type: A
       AliasTarget:
-        DNSName: !GetAtt StaticSiteBucket.WebsiteURL
-        HostedZoneId: Z3AQBSTGFYJSTF # HostedZone de S3 (fijo para cada región, este es un ejemplo us-east-1)
+        DNSName: !Sub "s3-website-us-east-1.amazonaws.com"
+        HostedZoneId: Z3AQBSTGFYJSTF # HostedZone ID fijo para S3 Website en us-east-1
 
 Outputs:
   SubDomainName:
