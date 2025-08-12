@@ -48,7 +48,7 @@ Resources:
       Type: A
       AliasTarget:
         HostedZoneId: Z3AQBSTGFYJSTF # HostedZoneId fijo de S3 website en us-east-1
-        DNSName: !Sub "s3-website-us-east-1.amazonaws.com"
+        DNSName: !Sub "${S3Bucket}.s3-website-us-east-1.amazonaws.com"
 
 Outputs:
   WebsiteURL:

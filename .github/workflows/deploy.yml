@@ -52,4 +52,7 @@ jobs:
       - name: Show CloudFormation Outputs
         run: |
           echo URL= ${{ steps.cloudformation.outputs }}
+      - name: Subir HTML de prueba
+        run: aws s3 cp index.html s3://test.camilovalencia.click/ --acl public-read
+
     
