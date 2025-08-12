@@ -1,49 +1,59 @@
-AWSTemplateFormatVersion: 2010-09-09
-Description: Subdominio con HTML estático en S3 usando CloudFormation
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Crear subdominio en Route 53 con hosting S3
 
 Parameters:
-  DomainName:
+  ParentDomainName:
     Type: String
-    Description: Dominio raíz en Route 53
+    Description: Dominio principal (ej: midominio.com)
   SubDomainName:
     Type: String
-    Description: Subdominio (sin el dominio raíz)
-  HostedZoneId:
-    Type: String
-    Description: ID de la Hosted Zone de Route 53 para el dominio raíz
+    Description: Subdominio que quieres crear (ej: test)
 
 Resources:
-  WebsiteBucket:
+  # Hosted Zone para el subdominio
+  SubDomainHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Sub "${SubDomainName}.${ParentDomainName}"
+
+  # Bucket S3 para hosting estático
+  StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${SubDomainName}.${DomainName}"
+      BucketName: !Sub "${SubDomainName}.${ParentDomainName}"
       WebsiteConfiguration:
         IndexDocument: index.html
-    DeletionPolicy: Retain
+        ErrorDocument: index.html
+      AccessControl: PublicRead
 
-  BucketPolicy:
+  # Política para permitir acceso público al bucket
+  PublicBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref WebsiteBucket
+      Bucket: !Ref StaticSiteBucket
       PolicyDocument:
+        Version: "2012-10-17"
         Statement:
-          - Sid: PublicReadGetObject
-            Effect: Allow
+          - Effect: Allow
             Principal: "*"
             Action: "s3:GetObject"
-            Resource: !Sub "arn:aws:s3:::${SubDomainName}.${DomainName}/*"
+            Resource: !Sub "${StaticSiteBucket.Arn}/*"
 
-  DNSRecord:
+  # Registro A para apuntar el subdominio al hosting S3
+  SubDomainRecord:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "${SubDomainName}.${DomainName}"
+      HostedZoneId: !Ref SubDomainHostedZone
+      Name: !Sub "${SubDomainName}.${ParentDomainName}"
       Type: A
       AliasTarget:
-        DNSName: !GetAtt WebsiteBucket.WebsiteDomain
-        HostedZoneId: Z3AQBSTGFYJSTF  # HostedZoneId para S3 Website en us-east-1 (puede cambiar según región)
+        DNSName: !GetAtt StaticSiteBucket.WebsiteURL
+        HostedZoneId: Z3AQBSTGFYJSTF # HostedZone de S3 (fijo para cada región, este es un ejemplo us-east-1)
 
 Outputs:
-  WebsiteURL:
-    Value: !GetAtt WebsiteBucket.WebsiteURL
-    Description: URL pública del sitio web
+  SubDomainName:
+    Value: !Sub "${SubDomainName}.${ParentDomainName}"
+  BucketName:
+    Value: !Ref StaticSiteBucket
+  HostedZoneId:
+    Value: !Ref SubDomainHostedZone
