@@ -10,6 +10,8 @@ env:
 
   HOSTED_ZONES_ROUTE53: ${{ vars.HOSTED_ZONES_ROUTE53 }}
   PROJECTNAME_DEV: ${{ vars.PROJECTNAME_DEV }}
+  PARENT_DOMAIN_NAME: ${{ vars.PARENT_DOMAIN_NAME }}
+  SUBDOMAIN_NAME: ${{ vars.SUBDOMAIN_NAME }}
 jobs:
   deploy-dev:
     name: Deploy to AWS
@@ -46,7 +48,8 @@ jobs:
           template: cloudformation.yml
           no-fail-on-empty-changeset: "1"
           parameter-overrides: >-
-            ParentDomainName=${{ env.PARENT_DOMAIN_NAME }}, SubDomainName=${{ env.SUBDOMAIN_NAME }}
+            ParentDomainName=${{ env.PARENT_DOMAIN_NAME }},
+            SubDomainName=${{ env.SUBDOMAIN_NAME }}
 
       - name: Show CloudFormation Outputs
         run: |
